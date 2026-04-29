@@ -1,14 +1,77 @@
-# Auto-AVSR: Lip-reading Sentences Project
+# Backend — Lip Reading API
 
-## Update
+API REST para transcripción de vídeo mediante lectura de labios, basada en el modelo **Auto-AVSR**. Construida con FastAPI y servida con Uvicorn.
 
-`2025-01-06`: Reduced package dependencies.
+## Tecnologías
 
-`2023-07-26`: Released [real-time av-asr training code](https://github.com/pytorch/audio/tree/main/examples/avsr).
+- **Python 3.10**
+- **FastAPI** — framework de la API
+- **PyTorch + Auto-AVSR** — modelo de Visual Speech Recognition (VSR)
+- **MediaPipe** — detección de landmarks faciales
+- **OpenCV** — procesamiento de vídeo
+- **Docker** — contenedorización
 
-## Introduction
+## Endpoints
 
-This repository is an open-sourced framework for speech recognition, with a primary focus on visual speech (lip-reading). It is designed for end-to-end training, aiming to deliver state-of-the-art models and enable reproducibility on audio-visual speech benchmarks.
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| `GET`  | `/` | Health check |
+| `POST` | `/transcribe` | Recibe un fichero de vídeo y devuelve la transcripción |
+
+### Ejemplo de uso
+
+```bash
+curl -X POST http://localhost:8000/transcribe \
+  -F "video=@mi_video.mp4"
+```
+
+Respuesta:
+```json
+{ "success": true, "text": "hello world" }
+```
+
+## Ejecución con Docker (recomendado)
+
+Desde la raíz del monorepo:
+
+```bash
+docker compose up --build lipreading-api
+```
+
+O solo el backend con su propio Dockerfile:
+
+```bash
+docker build -t lipreading-api .
+docker run -p 8000:8000 lipreading-api
+```
+
+## Ejecución local
+
+1. Instala las dependencias:
+
+```bash
+pip install -r requirements.txt
+```
+
+2. Descarga el modelo de pesos en la carpeta `backend-python/`:
+
+```bash
+gdown 1r1kx7l9sWnDOCnaFHIGvOtzuhFyFA88_ -O vsr_trlrs2lrs3vox2avsp_base.pth
+```
+
+3. Arranca el servidor:
+
+```bash
+uvicorn api:app --host 0.0.0.0 --port 8000
+```
+
+## Notas sobre el modelo
+
+El modelo utilizado es `vsr_trlrs2lrs3vox2avsp_base.pth`, entrenado en LRS2, LRS3, VoxCeleb2 y AVSpeech. Consigue un WER del 20.3% en LRS3 para reconocimiento visual puro.
+
+---
+
+> Basado en [Auto-AVSR](https://github.com/mpc001/auto_avsr) (Meta / MMAI Group).
 
 <div align="center"><img src="doc/pipeline.png" width="640"/></div>
 

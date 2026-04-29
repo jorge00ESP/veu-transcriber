@@ -1,6 +1,62 @@
-# TransAudio
+# Frontend — Veu Transcriber
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.2.
+Interfaz web para subir vídeos y obtener su transcripción mediante el backend de lip reading. Construida con Angular 21 y servida en producción con nginx.
+
+## Tecnologías
+
+- **Angular 21** (standalone components, signals)
+- **TypeScript**
+- **SCSS**
+- **nginx** — servidor de producción (en Docker)
+
+## Funcionalidad
+
+1. El usuario selecciona o arrastra un fichero de vídeo.
+2. El vídeo se previsualiza en pantalla.
+3. Al pulsar *Transcribe*, el fichero se envía al backend (`POST /transcribe`).
+4. La transcripción se muestra en pantalla con opción de copiarla.
+
+## Ejecución con Docker (recomendado)
+
+Desde la raíz del monorepo:
+
+```bash
+docker compose up --build lipreading-frontend
+```
+
+La app quedará disponible en `http://localhost`.
+
+## Desarrollo local
+
+1. Instala las dependencias:
+
+```bash
+npm install
+```
+
+2. Arranca el servidor de desarrollo:
+
+```bash
+ng serve
+```
+
+Abre el navegador en `http://localhost:4200`.
+
+> Asegúrate de que el backend está corriendo en `http://localhost:8000` antes de usar la app.
+
+## Build de producción
+
+```bash
+ng build --configuration production
+```
+
+Los artefactos se generan en `dist/trans-audio/browser/`.
+
+## Tests
+
+```bash
+ng test
+```
 
 ## Development server
 
