@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+python-multipart
+torch
+torchvision
+torchaudio
+pytorch-lightning
+mediapipe==0.10.9
+opencv-python-headless
+av
+sentencepiece
+gdown
+scikit-image

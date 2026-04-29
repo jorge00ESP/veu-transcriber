@@ -1,0 +1,22 @@
+services:
+  lipreading-api:
+    build:
+      context: ./backend-python
+      dockerfile: Dockerfile
+    container_name: lipreading-api
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    environment:
+      PYTHONUNBUFFERED: "1"
+
+  lipreading-frontend:
+    build:
+      context: ./frontend-angular
+      dockerfile: Dockerfile
+    container_name: lipreading-frontend
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    depends_on:
+      - lipreading-api

@@ -1,0 +1,143 @@
+<div class="app">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header__inner">
+      <div class="header__brand">
+        <img class="header__logo" src="logo.jpeg" alt="VEU Logo" />
+        <div class="header__title">
+          <h1>VEU Transcriber</h1>
+          <span>AI-powered video transcription</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="container">
+
+      <!-- Upload card -->
+      <section class="card">
+        <div class="card__header">
+          <div class="card__icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="3" width="20" height="14" rx="2"/>
+              <path d="M8 21h8M12 17v4"/>
+            </svg>
+          </div>
+          <div>
+            <h2>Upload Video</h2>
+            <p>Select a video file to transcribe its audio</p>
+          </div>
+        </div>
+
+        <label class="drop-zone" [class.has-video]="isVideoSelected()">
+          <input type="file" accept="video/*" (change)="onFileSelected($event)" hidden />
+          @if (!isVideoSelected()) {
+            <div class="drop-zone__idle">
+              <div class="drop-zone__icon-wrap">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="17 8 12 3 7 8"/>
+                  <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+              </div>
+              <strong>Click to select a video</strong>
+              <span>MP4, MOV, AVI, MKV and more</span>
+            </div>
+          } @else {
+            <video controls [src]="videoUrl()" (click)="$event.stopPropagation()"></video>
+          }
+        </label>
+
+        @if (isVideoSelected()) {
+          <div class="file-info">
+            <span class="file-chip">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+              </svg>
+              {{ videoName() }}
+            </span>
+            <button class="btn btn--remove" (click)="clearVideo()" title="Remove video">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+        }
+
+        <button
+          class="btn btn--primary"
+          [disabled]="!isVideoSelected() || isProcessing()"
+          (click)="serviceFile()"
+        >
+          @if (isProcessing()) {
+            <span class="spinner"></span>
+            Processing...
+          } @else {
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+              <line x1="12" y1="19" x2="12" y2="22"/>
+            </svg>
+            Transcribe
+          }
+        </button>
+      </section>
+
+      <!-- Result card -->
+      <section class="card result-card">
+        <div class="card__header">
+          <div class="card__icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/>
+            </svg>
+          </div>
+          <div>
+            <h2>Transcription</h2>
+            <p>AI-generated text from your video</p>
+          </div>
+        </div>
+
+        @if (isProcessing()) {
+          <div class="processing-state">
+            <div class="wave-bars">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <p>Transcribing audio...</p>
+          </div>
+        } @else if (transcription()) {
+          <div class="transcript">{{ transcription() }}</div>
+          <button class="btn btn--ghost" (click)="copyTranscription()">
+            @if (copied()) {
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Copied!
+            } @else {
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+              </svg>
+              Copy text
+            }
+          </button>
+        } @else {
+          <div class="empty-state">
+            <div class="empty-state__icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                <line x1="12" y1="19" x2="12" y2="22"/>
+              </svg>
+            </div>
+            <strong>No transcription yet</strong>
+            <span>Upload a video and click Transcribe to get started</span>
+          </div>
+        }
+      </section>
+
+    </div>
+  </main>
+
+</div>
